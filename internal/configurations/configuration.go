@@ -3,6 +3,7 @@ package configurations
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -31,8 +32,8 @@ type AuthConfig struct {
 }
 
 func NewConfig() (*Config, error) {
-	viper.SetConfigType("env")
 	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	viper.SetDefault("server.addr", ":8080")
 	viper.SetDefault("auth.enabled", false)
