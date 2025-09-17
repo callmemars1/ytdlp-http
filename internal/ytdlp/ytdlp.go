@@ -126,10 +126,14 @@ func (s *Service) DownloadVideo(ctx context.Context, url string, options *Option
 	args = append(args, url)
 
 	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
-	if err := cmd.Run(); err != nil {
-		s.logger.Error("Failed to download video", zap.Error(err), zap.String("url", url))
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		s.logger.Error("Failed to download video", 
+			zap.Error(err), 
+			zap.String("url", url),
+			zap.String("yt_dlp_output", string(output)))
 		os.RemoveAll(uniqueDir)
-		return "", nil, fmt.Errorf("failed to download video: %w", err)
+		return "", nil, fmt.Errorf("failed to download video: %w - output: %s", err, string(output))
 	}
 
 	files, err := os.ReadDir(uniqueDir)
