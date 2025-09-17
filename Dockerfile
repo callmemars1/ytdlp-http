@@ -1,7 +1,19 @@
 # Build stage
-FROM golang:1.25-bullseye AS builder
+FROM ubuntu:22.04 AS builder
 
 WORKDIR /app
+
+# Install Go
+RUN apt-get update && apt-get install -y \
+    wget \
+    tar \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN wget -O go.tar.gz https://golang.org/dl/go1.25.0.linux-amd64.tar.gz \
+    && tar -C /usr/local -xzf go.tar.gz \
+    && rm go.tar.gz
+
+ENV PATH="/usr/local/go/bin:${PATH}"
 
 # Copy go mod files
 COPY go.mod go.sum ./
