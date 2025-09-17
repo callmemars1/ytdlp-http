@@ -1,10 +1,7 @@
 # Build stage
-FROM golang:1.25-alpine AS builder
+FROM golang:1.25-bullseye AS builder
 
 WORKDIR /app
-
-# Install build dependencies
-RUN apk add --no-cache git ca-certificates
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -19,23 +16,24 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/main.go
 
 # Runtime stage
-FROM alpine:3.20
+FROM ubuntu:22.04
 
-# Install yt-dlp, ffmpeg, and other dependencies
-RUN apk add --no-cache \
-    yt-dlp \
-    ffmpeg \
+# Install dependencies
+RUN apt-get update && apt-get install -y \
     python3 \
-    py3-pip \
+    python3-pip \
+    ffmpeg \
+    curl \
     ca-certificates \
-    tzdata
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
-# Update yt-dlp to latest version
-RUN yt-dlp -U
+# Install latest yt-dlp
+RUN pip3 install -U yt-dlp
 
 # Create non-root user
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+RUN groupadd -g 1001 appgroup && \
+    useradd -u 1001 -g appgroup -s /bin/bash -m appuser
 
 # Create directories with proper permissions
 RUN mkdir -p /app/downloads /tmp/ytdlp-downloads && \
