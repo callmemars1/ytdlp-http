@@ -33,7 +33,16 @@ type AuthConfig struct {
 
 func NewConfig() (*Config, error) {
 	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	
+	// Bind environment variables directly
+	viper.BindEnv("s3.access_key_id", "S3_ACCESS_KEY_ID")
+	viper.BindEnv("s3.secret_access_key", "S3_SECRET_ACCESS_KEY")
+	viper.BindEnv("s3.region", "S3_REGION")
+	viper.BindEnv("s3.bucket", "S3_BUCKET")
+	viper.BindEnv("s3.endpoint", "S3_ENDPOINT")
+	viper.BindEnv("server.addr", "SERVER_ADDR")
+	viper.BindEnv("auth.enabled", "AUTH_ENABLED")
+	viper.BindEnv("auth.api_key", "AUTH_API_KEY")
 
 	viper.SetDefault("server.addr", ":8080")
 	viper.SetDefault("auth.enabled", false)
