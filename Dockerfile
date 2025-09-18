@@ -59,13 +59,6 @@ WORKDIR /app
 # Copy the binary from builder stage
 COPY --from=builder --chown=appuser:appgroup /app/main .
 
-# Expose port
-EXPOSE 8080
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
-
 # Set environment variables
 ENV GIN_MODE=release
 ENV TZ=UTC
